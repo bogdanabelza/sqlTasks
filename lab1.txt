@@ -46,7 +46,7 @@ VALUES
 ('220', '4687', 'No', 'Эффективное использование C++. 50 рекомендаций по улучшению ваших программ и проектов', '17.60', 'ДМК', '240', '70х100/16', '2000-03-02', 'Програмування', 'C&C++');
 
 ALTER TABLE product ADD COLUMN Автор Varchar(15);
-ALTER TABLE `product` MODIFY 'Авторй' VARCHAR(20);
+ALTER TABLE `product` MODIFY 'Автор' VARCHAR(20);
 ALTER TABLE product DROP COLUMN Автор;
 
 CREATE INDEX новинка_index ON product(Новинка);
