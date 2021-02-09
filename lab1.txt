@@ -50,10 +50,11 @@ ALTER TABLE `product` MODIFY 'Авторй' VARCHAR(20);
 ALTER TABLE product DROP COLUMN Автор;
 
 CREATE INDEX новинка_index ON product(Новинка);
+CREATE INDEX ціна_index ON product(Ціна)
 SELECT Новинка FROM `product`;
 SELECT * FROM product ORDER BY новинка_index;
-SELECT * FROM product ORDER BY Новинка DESC;
-SELECT * FROM product ORDER BY Новинка ASC;
+SELECT * FROM product ORDER BY Ціна DESC;
+SELECT * FROM product ORDER BY Ціна ASC;
 CREATE UNIQUE INDEX N_index ON product(N);
 DROP INDEX новинка_index ON product;
 DROP INDEX N_index ON product;
