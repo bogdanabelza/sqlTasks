@@ -1,0 +1,69 @@
+SELECT N FROM `product`;
+SELECT Код FROM `product`;
+SELECT Новинка FROM `product`;
+SELECT Назва FROM `product`;
+SELECT Ціна FROM `product`;
+SELECT Сторінки FROM `product`;
+SELECT N, Код, Новинка, Назва, Ціна, Сторінки FROM `product`;
+
+********************************************************
+SELECT * FROM `product`;
+
+********************************************************
+SELECT Код, Назва, Новинка, Сторінки, Ціна, N FROM `product`;
+
+********************************************************
+SELECT * FROM `product` WHERE id < 11;
+SELECT * FROM `product` LIMIT 0, 10; //запись MySql
+
+********************************************************
+SELECT TOP 10 PERCENT * FROM `product`; ???????????????????????
+select count(*) * 0.1 from `product`;//можно использовать LIMIT
+
+********************************************************
+SELECT * FROM `product` GROUP BY Код;
+
+********************************************************
+SELECT Назва FROM `product` WHERE Новинка = 'Yes';
+
+********************************************************
+SELECT Назва FROM `product` WHERE Новинка = 'Yes' AND Ціна BETWEEN 20 AND 30;
+
+********************************************************
+SELECT Назва FROM `product` WHERE Новинка = 'Yes' AND Ціна NOT BETWEEN 20 AND 30;
+
+********************************************************
+SELECT * FROM `product` WHERE Ціна >= 20 AND Ціна <= 30 AND Сторінки BETWEEN 300 AND 400;
+
+********************************************************
+SELECT * FROM `product` WHERE  YEAR(Дата) IN (2000) AND MONTH(Дата) IN (12,1,2);
+
+********************************************************
+SELECT * FROM `product` WHERE Код IN(5110, 5141, 4985, 4241);
+
+********************************************************
+SELECT * FROM `product` WHERE YEAR(Дата) IN(1999, 2001, 2003, 2005);
+
+********************************************************
+SELECT * FROM `product` WHERE Назва RLIKE '^[А-К]';//выполняет сопоставление строкового выражения с шаблоном (REGEXP)
+
+********************************************************
+SELECT * FROM `product` WHERE Назва RLIKE '^АПП' AND YEAR(Дата) IN (2000) AND Ціна <= 20;
+
+********************************************************
+SELECT * FSELECT * FROM `product` WHERE Назва LIKE 'АПП%е%' AND YEAR(Дата) IN (2000) AND MONTH(Дата) IN (1, 2, 3, 4, 5, 6);
+//SELECT * FROM `product` WHERE SUBSTR (Назва, 1) = 'АПП' AND SUBSTR (Назва, -1) = 'е' AND YEAR(Дата) IN (2000) AND MONTH(Дата) IN (7);
+
+
+********************************************************
+SELECT * FROM `product` WHERE Назва LIKE '%Microsoft%' AND NOT '%Windows%';
+
+********************************************************
+SELECT * FROM `product` WHERE Назва LIKE '[0-9]%';
+SELECT * FROM `product` WHERE Назва REGEXP '[[:digit:]]' = 1;
+
+********************************************************
+SELECT * FROM `product` WHERE Назва REGEXP  '[[:digit:]]{3,}' = 1;// это означает 3 и более цифр в тексте
+
+********************************************************
+SELECT * FROM `product` WHERE Назва REGEXP '[[:digit:]]{5}' = 1;
