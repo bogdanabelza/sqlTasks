@@ -42,16 +42,16 @@ SELECT LEFT(Назва, 1), COUNT(*) AS загальна_кількість_вс
 WHERE YEAR(Дата) IN (2000) GROUP BY Назва HAVING LEFT(Назва, 1) NOT RLIKE '^[A-Za-z]' AND Назва NOT RLIKE '^[0-9]'  ORDER BY Назва  DESC;
 
 ******************************************************
-SELECT Дата, Назва, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) 
-FROM `product` WHERE YEAR(Дата) AND MONTH(Дата) GROUP BY Назва, Дата;
+SELECT Дата COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) 
+FROM `product` WHERE YEAR(Дата) AND MONTH(Дата) GROUP BY Дата;
 
 ******************************************************
-SELECT Дата, Назва, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) 
-FROM `product` WHERE YEAR(Дата) AND MONTH(Дата) AND Дата IS NOT NULL GROUP BY Назва, Дата;
+SELECT Дата, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) 
+FROM `product` WHERE YEAR(Дата) AND MONTH(Дата) AND Дата IS NOT NULL GROUP BY Дата;
 
 ******************************************************
-SELECT Дата, Назва, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) 
-FROM `product` WHERE YEAR(Дата) AND MONTH(Дата) GROUP BY Назва, Дата ORDER BY YEAR(Дата) DESC, MONTH(Дата) ASC;
+SELECT Дата, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) 
+FROM `product` WHERE YEAR(Дата) AND MONTH(Дата) GROUP BY Дата ORDER BY YEAR(Дата) DESC, MONTH(Дата) ASC;
 
 ******************************************************
 SELECT Новинка , COUNT(*) AS новинка__не_новинка, SUM(Ціна), SUM(Ціна * 73.76)  AS Ціна_руб, SUM(Ціна * 0.82) AS Ціна_евро, SUM(Ціна * 27.83) AS Ціна_грн FROM `product` GROUP BY Новинка;
