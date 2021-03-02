@@ -5,17 +5,18 @@ SELECT Назва, COUNT(*) AS загальна_кількість_всіх_кн
 SELECT Назва, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) FROM `product` WHERE Ціна IS NOT NULL GROUP BY Назва;
 
 ******************************************************
-SELECT Назва, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) FROM `product` WHERE Новинка = 'Yes' GROUP BY Назва; //WHERE Новинка = 'No'
+SELECT Новинка, COUNT(*) AS новинка__не_новинка, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) 
+FROM `product`  GROUP BY Новинка;
 
 ******************************************************
-SELECT COUNT(Назва), SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) FROM `product` WHERE YEAR(Дата) IN (2000, 1999);
-//SELECT Назва, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) FROM `product` WHERE YEAR(Дата) BETWEEN 2000 AND 2002 GROUP BY Назва;
+SELECT Дата, COUNT(*) AS дата, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) 
+FROM `product`  GROUP BY Дата;
 
 ******************************************************
-SELECT Назва, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) FROM `product` WHERE YEAR(Дата) BETWEEN 2000 AND 2002 AND Ціна BETWEEN 10 AND 20 GROUP BY Назва;
+SELECT Дата, COUNT(*) AS дата, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) FROM `product` WHERE YEAR(Дата) BETWEEN 2000 AND 2002 AND Ціна BETWEEN 10 AND 20 GROUP BY Дата;
 
 ******************************************************
-SELECT Назва, COUNT(*) AS загальна_кількість_всіх_книг, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) FROM `product` GROUP BY Назва ORDER BY загальна_кількість_всіх_книг DESC;
+SELECT Дата, COUNT(*) AS дата, SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) FROM `product` GROUP BY Дата ORDER BY дата DESC;
 //SELECT COUNT(Назва), SUM(Ціна), AVG(Ціна), MAX(Ціна), MIN(Ціна) AS Статистика FROM `product` WHERE YEAR(Дата) IN (2000, 1999) AND Ціна BETWEEN 10 AND 20 ORDER BY Статистика
 
 ******************************************************
