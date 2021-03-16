@@ -1,0 +1,122 @@
+CREATE TABLE Новинка(
+    id INT NOT NULL AUTO_INCREMENT,
+    Новинка VARCHAR(3) NOT NULL,
+    id_new INT,
+    PRIMARY KEY(id)
+);
+INSERT INTO новинка (Новинка, id_new) 
+VALUES 
+('Yes', 4),
+('No', 1);
+ALTER TABLE новинка
+ADD FOREIGN KEY (id_new)
+REFERENCES product(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+****************
+CREATE TABLE Видавництво(
+    id INT NOT NULL AUTO_INCREMENT,
+    Видавництво VARCHAR(50) NOT NULL,
+    id_edition INT,
+    PRIMARY KEY(id)
+);
+ALTER TABLE `видавництво`
+ADD FOREIGN KEY (id_edition)
+REFERENCES product(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+INSERT INTO видавництво (Видавництво, id_edition)
+VALUES
+('BHV С.-Петербург', 1),
+('Вильямс', 2),
+('Питер', 3),
+('МикроАрт', 4),
+('DiaSoft', 1),
+('ДМК', 1),
+('Триумф', 1),
+('Эком', 1),
+('Русская редакция', 1);
+
+**************
+CREATE TABLE Формат(
+    id INT NOT NULL AUTO_INCREMENT,
+    Формат VARCHAR(9),
+    id_format INT,
+    PRIMARY KEY(id)
+);
+ALTER TABLE `формат`
+ADD FOREIGN KEY (id_format)
+REFERENCES product(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+INSERT INTO формат (Формат, id_format)
+VALUES
+('70х100/16', 1),
+('84х108/16', 2),
+('60х88/16', 3),
+('60х84/16', 4);
+
+*************
+CREATE TABLE тираж(
+    id INT NOT NULL AUTO_INCREMENT,
+    Тираж INT,
+    id_circulation INT,
+    PRIMARY KEY(id)
+);
+ALTER TABLE `тираж`
+ADD FOREIGN KEY (id_circulation)
+REFERENCES product(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+INSERT INTO тираж (Тираж, id_circulation)
+VALUES
+('500', 1);
+************
+
+CREATE TABLE тема(
+    id INT NOT NULL AUTO_INCREMENT,
+    Тема VARCHAR(50) NOT NULL,
+    id_topic INT,
+    PRIMARY KEY(id)
+);
+ALTER TABLE `тема`
+ADD FOREIGN KEY (id_topic)
+REFERENCES product(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+INSERT INTO тема (Тема, id_topic)
+VALUES
+('Використання ПК в цілому', 1),
+('Операційні системи', 2),
+('Програмування', 3);
+
+*********
+CREATE TABLE категорія(
+    id INT NOT NULL AUTO_INCREMENT,
+    Категорія VARCHAR(50) NOT NULL,
+    id_category INT,
+    PRIMARY KEY(id)
+);
+ALTER TABLE `категорія`
+ADD FOREIGN KEY (id_category)
+REFERENCES product(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+INSERT INTO категорія (Категорія, id_category)
+VALUES
+('Підручники', 1),
+('Апаратні засоби ПК', 1),
+('Захист і безпека ПК', 1),
+('Інші книги', 1),
+('Windows 2000', 1),
+('Linux', 1),
+('Unix', 1),
+('Інші операційні системи', 1),
+('C&C++', 1);
+
+CREATE TABLE product(
+    id INT NOT NULL AUTO_INCREMENT,
+    N INT NOT NULL UNIQUE,
+    Код INT NOT NULL UNIQUE,
+    Назва VARCHAR(255) NOT NULL,
+    Ціна DECIMAL(9,2) NOT NULL,
+    Сторінки SMALLINT NOT NULL,
+    Дата DATE NOT NULL,
+    PRIMARY KEY(id)
+);
+INSERT INTO product (N, Код, Назва, Ціна, Сторінки, Дата) 
+VALUES 
+('2', '5110', 'Аппаратные средства мультимедия. Видеосистема РС', '15.51', '400', '2000-07-24'),
+('8', '4985','Освой самостоятельно модернизацию и ремонт ПК за 24 часа, 2-е изд.', '18.90', '288', '2000-07-07'),
+('9', '5141','Структуры данных и алгоритмы.', '37.80', '384', '2000-09-29'),
+('20', '5127', 'Автоматизация инженерно-графических работ', '11.58', '256', '2000-06-15');
+
+******************************************************
