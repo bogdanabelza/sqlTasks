@@ -1,0 +1,125 @@
+1.SELECT Назва, Ціна, Видавництво FROM `product`
+INNER JOIN видавництво ON product.id = видавництво.id_edition;
+//SELECT Назва, Ціна, Видавництво FROM `product`, `видавництво` 
+WHERE product.id = видавництво.id_edition;
+2.SELECT Назва, Категорія FROM `product`
+INNER JOIN категорія ON product.id = категорія.id_category;
+3.SELECT Назва, Ціна, Видавництво, Формат FROM `product`
+INNER JOIN видавництво ON product.id = видавництво.id_edition
+INNER JOIN формат ON product.id = формат.id_format;
+4.SELECT Тема, Категорія, Назва, Видавництво FROM `product`
+INNER JOIN тема ON product.id = тема.id_topic
+INNER JOIN категорія ON product.id = категорія.id_category
+INNER JOIN видавництво ON product.id = видавництво.id_edition
+WHERE тема RLIKE '^В'
+ORDER BY тема, категорія
+5.SELECT Назва, Видавництво FROM `product`
+INNER JOIN видавництво ON product.id = видавництво.id_edition
+WHERE видавництво LIKE '%BHV%'  AND YEAR(Дата) = '2000';
+6.SELECT SUM(Сторінки), Категорія FROM `product`
+INNER JOIN категорія ON product.id = категорія.id_category
+GROUP BY категорія
+ORDER BY SUM(Сторінки);
+7.SELECT AVG(Ціна), Тема, Категорія FROM `product`
+INNER JOIN тема ON product.id = тема.id_topic
+INNER JOIN категорія ON product.id = категорія.id_category
+WHERE тема LIKE '%Використання ПК%' AND категорія = 'Linux'
+GROUP BY Тема, Категорія;
+8.SELECT * FROM `product`, `тема`, `категорія`, `видавництво`, `формат`, `новинка`, `тираж`
+WHERE product.id = тема.id_topic
+AND product.id = категорія.id_category
+AND product.id = видавництво.id_edition
+AND product.id = формат.id_format
+AND product.id = новинка.id_new
+AND product.id = тираж.id_circulation;
+//SELECT * FROM `product`, `тема`, `категорія`, `видавництво`, `формат`, `новинка`, `тираж`
+WHERE product.id = тема.id_topic AND категорія.id_category AND видавництво.id_edition AND формат.id_format AND новинка.id_new AND тираж.id_circulation
+
+9.SELECT * FROM `product`//product.*, видавництво.Видавництво, тема.Тема, категорія.Категорія, формат.Формат, новинка.Новинка, тираж.Тираж FROM `product`
+INNER JOIN видавництво ON product.id = видавництво.id_edition
+INNER JOIN тема ON product.id = тема.id_topic
+INNER JOIN категорія ON product.id = категорія.id_category
+INNER JOIN формат ON product.id = формат.id_format
+INNER JOIN новинка ON product.id = новинка.id_new
+INNER JOIN тираж ON product.id = тираж.id_circulation;
+
+10.SELECT product.*, видавництво.Видавництво, тема.Тема, категорія.Категорія, формат.Формат, новинка.Новинка, тираж.Тираж FROM `product`
+LEFT JOIN видавництво ON product.id = видавництво.id_edition
+LEFT JOIN тема ON product.id = тема.id_topic
+LEFT JOIN категорія ON product.id = категорія.id_category
+LEFT JOIN формат ON product.id = формат.id_format
+LEFT JOIN новинка ON product.id = новинка.id_new
+LEFT JOIN тираж ON product.id = тираж.id_circulation
+SELECT product.*, видавництво.Видавництво, тема.Тема, категорія.Категорія, формат.Формат, новинка.Новинка, тираж.Тираж FROM `product`
+RIGHT JOIN видавництво ON product.id = видавництво.id_edition
+RIGHT JOIN тема ON product.id = тема.id_topic
+RIGHT JOIN категорія ON product.id = категорія.id_category
+RIGHT JOIN формат ON product.id = формат.id_format
+RIGHT JOIN новинка ON product.id = новинка.id_new
+RIGHT JOIN тираж ON product.id = тираж.id_circulation
+//SELECT * FROM `product`
+LEFT JOIN видавництво ON product.id = видавництво.id_edition
+LEFT JOIN тема ON product.id = тема.id_topic
+LEFT JOIN категорія ON product.id = категорія.id_category
+LEFT JOIN формат ON product.id = формат.id_format
+LEFT JOIN новинка ON product.id = новинка.id_new
+LEFT JOIN тираж ON product.id = тираж.id_circulation;
+
+11.SELECT CONCAT(A.Назва, ',', B.Назва) AS Назва1, A.Сторінки
+FROM `product` A, `product` B
+WHERE A.id <> B.id
+AND A.Сторінки = B.Сторінки
+ORDER BY A.Сторінки
+
+12.SELECT CONCAT(A.Назва, ',', B.Назва, ',', C.Назва) AS Назва1, A.Ціна
+FROM `product` A, `product` B, `product` C
+WHERE A.id <> B.id <> C.id
+AND A.Ціна = B.Ціна = C.Ціна
+ORDER BY A.Ціна
+
+13.SELECT product.*
+FROM `product`
+INNER JOIN категорія ON product.id = категорія.id_category
+WHERE категорія IN (SELECT Категорія FROM `категорія`
+	WHERE Категорія LIKE '%C++%')
+
+14.SELECT product.*
+FROM `product`
+INNER JOIN видавництво ON product.id = видавництво.id_edition
+WHERE Видавництво IN (SELECT Видавництво FROM `категорія`
+	WHERE Видавництво LIKE '%BHV%') AND YEAR(Дата) > '2000'
+
+15.SELECT Видавництво,
+	(SELECT Сторінки FROM `product`
+	WHERE product.id = видавництво.id_edition AND Сторінки >= 400)
+FROM `видавництво`
+//SELECT Сторінки,
+        (SELECT Видавництво FROM `видавництво` 
+         WHERE product.id = видавництво.id_edition)
+FROM `product`
+WHERE Сторінки <= 300
+
+16.SELECT Категорія,
+	(SELECT Назва FROM `product`
+	WHERE product.id = категорія.id_category AND Назва <= 3)
+FROM `категорія`
+
+17.SELECT * FROM product
+WHERE EXISTS 
+(SELECT * FROM видавництво WHERE product.id = видавництво.id_edition AND Видавництво LIKE '%BHV%');
+
+18.SELECT * FROM product
+WHERE NOT EXISTS 
+(SELECT * FROM видавництво WHERE product.id = видавництво.id_edition AND Видавництво LIKE '%BHV%');
+
+19.SELECT Назва
+FROM тема
+UNION ALL SELECT Назва
+FROM категорія
+ORDER BY Назва;
+
+20.SELECT DISTINCT IF(INSTR(Назва, ' ') >0, LEFT(Назва, INSTR(Назва, ' ') - 1), Назва) AS new
+FROM тема
+UNION SELECT DISTINCT IF(INSTR(Назва, ' ') >0, LEFT(Назва, INSTR(Назва, ' ') - 1), Назва) AS new
+FROM категорія
+ORDER BY new DESC;
