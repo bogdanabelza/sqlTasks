@@ -4,13 +4,13 @@ CREATE TABLE Новинка(
     id_new INT,
     PRIMARY KEY(id)
 );
+ALTER TABLE новинка
+ADD FOREIGN KEY (id_new)
+REFERENCES product(id) ON DELETE CASCADE ON UPDATE RESTRICT;
 INSERT INTO новинка (Новинка, id_new) 
 VALUES 
 ('Yes', 4),
 ('No', 1);
-ALTER TABLE новинка
-ADD FOREIGN KEY (id_new)
-REFERENCES product(id) ON DELETE CASCADE ON UPDATE RESTRICT;
 ****************
 CREATE TABLE Видавництво(
     id INT NOT NULL AUTO_INCREMENT,
