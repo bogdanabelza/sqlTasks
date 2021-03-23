@@ -1,0 +1,191 @@
+1.
+DELIMITER $$
+CREATE PROCEDURE GetProduct()
+BEGIN
+	SELECT Назва, Ціна, Видавництво, Формат
+	FROM `product`
+    	INNER JOIN видавництво ON product.id = видавництво.id_edition
+	INNER JOIN формат ON product.id = формат.id_format
+	ORDER BY Назва;    
+END$$
+DELIMITER ;
+CALL GetProduct();
+2.
+DELIMITER $$
+CREATE PROCEDURE GetProduct1()
+BEGIN
+	SELECT Тема, Категорія, Назва, Видавництво
+	FROM `product`
+    INNER JOIN тема ON product.id = тема.id_topic
+	INNER JOIN категорія ON product.id = категорія.id_category
+    INNER JOIN видавництво ON product.id = видавництво.id_edition
+	ORDER BY Тема, Категорія DESC;    
+END$$
+DELIMITER ;
+CALL GetProduct1();
+
+3.
+DELIMITER $$
+CREATE PROCEDURE GetProduct2(IN v_Видавництво VARCHAR(20))
+BEGIN
+	SELECT Назва, Видавництво, Дата
+	FROM `product`
+    INNER JOIN видавництво ON product.id = видавництво.id_edition
+    WHERE Видавництво = v_Видавництво
+    AND YEAR(Дата) >= '2000';
+END$$
+DELIMITER ;
+CALL GetProduct2('BHV С.-Петербург');
+
+4.
+DELIMITER $$
+CREATE PROCEDURE GetProduct3()
+BEGIN
+	SELECT SUM(Сторінки) AS SumASC, SUM(Сторінки) AS SumDESC, Категорія
+	FROM `product`
+	INNER JOIN категорія ON product.id = категорія.id_category
+    	GROUP BY категорія
+	ORDER BY SumASC, SumDESC DESC;   
+END$$
+DELIMITER ;
+CALL GetProduct3();
+
+5.
+DELIMITER $$
+CREATE PROCEDURE GetProduct4()
+BEGIN
+	SELECT AVG(Ціна), Тема, Категорія FROM `product`
+    INNER JOIN тема ON product.id = тема.id_topic
+    INNER JOIN категорія ON product.id = категорія.id_category
+    WHERE тема LIKE '%Використання ПК%' AND категорія = 'Linux'
+    GROUP BY Тема, Категорія;   
+END$$
+DELIMITER ;
+CALL GetProduct4();
+
+6.DELIMITER $$
+CREATE PROCEDURE GetProduct6()
+BEGIN
+    SELECT product.*, 
+    видавництво.Видавництво, тема.Тема, категорія.Категорія, формат.Формат, новинка.Новинка, тираж.Тираж 
+    FROM `product`
+    INNER JOIN видавництво ON product.id = видавництво.id_edition
+    INNER JOIN тема ON product.id = тема.id_topic
+    INNER JOIN категорія ON product.id = категорія.id_category
+    INNER JOIN формат ON product.id = формат.id_format
+    INNER JOIN новинка ON product.id = новинка.id_new
+    INNER JOIN тираж ON product.id = тираж.id_circulation;
+ 
+END$$
+DELIMITER ;
+CALL GetProduct6();
+
+7.DELIMITER $$
+CREATE PROCEDURE GetProduct7()
+BEGIN
+    SELECT CONCAT(A.Назва, ',', B.Назва) AS Назва1, A.Сторінки
+    FROM `product` A, `product` B
+    WHERE A.id <> B.id
+    AND A.Сторінки = B.Сторінки
+    ORDER BY A.Сторінки;
+ 
+END$$
+DELIMITER ;
+CALL GetProduct7();
+
+8.DELIMITER $$
+CREATE PROCEDURE GetProduct8()
+BEGIN
+    SELECT CONCAT(A.Назва, ',', B.Назва, ',', C.Назва) AS Назва1, A.Ціна
+	FROM `product` A, `product` B, `product` C
+	WHERE A.id <> B.id <> C.id
+	AND A.Ціна = B.Ціна = C.Ціна
+	ORDER BY A.Ціна;
+ 
+END$$
+DELIMITER ;
+CALL GetProduct8();
+
+9.
+DELIMITER $$
+CREATE PROCEDURE GetProduct9(IN p_Категорія VARCHAR(20))
+BEGIN
+    SELECT product.* 
+    FROM `product`
+    INNER JOIN категорія ON product.id = категорія.id_category
+    WHERE Категорія = p_Категорія;
+END$$
+DELIMITER ;
+CALL GetProduct9('C&C++');
+
+10.DELIMITER $$                            
+CREATE PROCEDURE GetProduct10()
+BEGIN
+    SELECT Видавництво,
+		(SELECT Сторінки FROM `product`
+		WHERE product.id = видавництво.id_edition AND Сторінки >= 400)
+	FROM `видавництво`;
+END$$
+DELIMITER ;
+CALL GetProduct10();
+
+11.DELIMITER $$
+CREATE PROCEDURE GetProduct11()
+BEGIN
+   SELECT Категорія,
+	(SELECT Назва FROM `product`
+	WHERE product.id = категорія.id_category AND Назва <= 3)
+FROM `категорія`;
+END$$
+DELIMITER ;
+CALL GetProduct11();
+
+12.
+DELIMITER $$
+CREATE PROCEDURE GetProduct12(IN v_Видавництво VARCHAR(20))
+BEGIN
+	SELECT * FROM product
+	WHERE EXISTS 
+	(SELECT * FROM видавництво WHERE product.id = видавництво.id_edition
+    AND Видавництво = v_Видавництво);
+END$$
+DELIMITER ;
+CALL GetProduct12('BHV С.-Петербург');
+
+13.
+DELIMITER $$
+CREATE PROCEDURE GetProduct13(IN v_Видавництво VARCHAR(20))
+BEGIN
+	SELECT * FROM product
+	WHERE NOT EXISTS 
+	(SELECT * FROM видавництво WHERE product.id = видавництво.id_edition
+    AND Видавництво = v_Видавництво);
+END$$
+DELIMITER ;
+CALL GetProduct13('BHV С.-Петербург');
+
+14.
+DELIMITER $$                            
+CREATE PROCEDURE GetProduct14()
+BEGIN
+    SELECT Назва //это название столбця в таблице тема
+    FROM `тема`
+    UNION ALL SELECT Назва //это название столбця в таблице категория, названия столбця в таблицах должны совпадать
+    FROM `категорія`
+    ORDER BY Назва;
+END$$
+DELIMITER ;
+CALL GetProduct14();
+
+15.
+DELIMITER $$                            
+CREATE PROCEDURE GetProduct15()
+BEGIN
+    SELECT DISTINCT IF(INSTR(Назва, ' ') >0, LEFT(Назва, INSTR(Назва, ' ') - 1), Назва) AS new
+    FROM `тема`
+    UNION SELECT DISTINCT IF(INSTR(Назва, ' ') >0, LEFT(Назва, INSTR(Назва, ' ') - 1), Назва) AS new
+    FROM `категорія`
+    ORDER BY new DESC;
+END$$
+DELIMITER ;
+CALL GetProduct15();
