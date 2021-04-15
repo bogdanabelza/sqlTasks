@@ -1,0 +1,219 @@
+SHOW TRIGGERS;
+DROP TRIGGER `trigger_1`;
+1.DELIMITER //
+CREATE  TRIGGER `trigger_1` AFTER INSERT ON `тема`
+FOR EACH ROW
+    IF 5 <= NEW.id <= 10 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Topic has exceeded the allowed amount of 10.';
+END IF//
+DELIMITER ;
+
+2.//Новинкою може бути тільки книга видана в поточному році.
+
+DELIMITER //
+CREATE  TRIGGER `trigger_2` AFTER INSERT ON `новинка`
+FOR EACH ROW
+BEGIN
+    IF NEW.Дата = CURRENT_DATE() IN (SELECT Дата FROM product) THEN 
+    Новинка = 'Yes' WHERE product.id = новинка.id_new
+    ELSE Новинка = 'No';
+    END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER `trigger_2` BEFORE INSERT ON `product`
+FOR EACH ROW 
+BEGIN
+  IF NEW.Дата = CURRENT_DATE()
+    SET NEW.Новинка = 'Yes'
+  ELSE SET NEW.Новинка = 'No';
+  END IF;
+  
+END; 
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE  TRIGGER trigger_2 AFTER INSERT ON новинка
+FOR EACH ROW
+BEGIN
+    IF YEAR( NEW.Дата ) = YEAR( CURDATE() ) THEN 
+    Новинка = 'Yes' WHERE product.id = новинка.id_new
+    ELSE Новинка = 'No';
+    END IF;
+END //
+DELIMITER ;
+
+3.//Книга з кількістю сторінок до 100 не може коштувати більше 10 $, до 200 - 20 $, до 300 - 30 $.
+DELIMITER //
+CREATE  TRIGGER `trigger_3` AFTER INSERT ON `product`
+FOR EACH ROW
+BEGIN
+   IF (NEW.Сторінки <= 100) AND (new.Ціна > 10)   THEN
+       SIGNAL SQLSTATE '45000'
+       SET MESSAGE_TEXT = 'The price cannot be more than 10 dollars.';
+
+   ELSEIF (NEW.Сторінки <= 200) AND (new.Ціна > 20)   THEN
+       SIGNAL SQLSTATE '45000'
+       SET MESSAGE_TEXT = 'The price cannot be more than 20 dollars.';
+
+   ELSEIF (NEW.Сторінки <= 300) AND (new.Ціна > 30)   THEN
+       SIGNAL SQLSTATE '45000'
+       SET MESSAGE_TEXT = 'The price cannot be more than 30 dollars.';
+   END IF;
+END //
+DELIMITER ;
+
+4. //Видавництво "BHV" не випускає книги накладом меншим 5000, а видавництво Diasoft - 10000.
+DELIMITER //
+CREATE  TRIGGER `trigger_4` BEFORE UPDATE ON `видавництво`
+FOR EACH ROW
+BEGIN
+   IF (OLD.Видавництво RLIKE "%BHV%") AND (OLD.Тираж <= '5000') THEN
+       SIGNAL SQLSTATE '45000'
+       SET MESSAGE_TEXT = 'The edition can be more than 5000 circulation.';
+
+   ELSEIF (OLD.Видавництво RLIKE "%Diasoft%") AND (OLD.Тираж <= '10000' IN (SELECT Тираж FROM тираж)) THEN
+       SIGNAL SQLSTATE '45000'
+       SET MESSAGE_TEXT = 'The edition can be more than 5000 circulation.';
+   END IF;
+END //
+DELIMITER ;
+
+5.//Книги з однаковим кодом повинні мати однакові дані.
+DELIMITER //
+CREATE  TRIGGER `trigger_5` AFTER INSERT ON `product`
+FOR EACH ROW
+BEGIN
+	UPDATE `product`
+	SET NEW.Код = Код;
+END //
+DELIMITER ;
+INSERT INTO `product`(`N`, `Код`, `Назва`, `Ціна`, `Сторінки`, `Дата`) VALUES ('22' ,'5110', 'cscdfd', '10', '321', '2000-08-25');
+
+DELIMITER //
+CREATE  TRIGGER `trigger_5_1` AFTER INSERT ON `product`
+FOR EACH ROW
+BEGIN
+	IF NEW.Код = Код THEN 
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'This code is already in use.';
+   END IF;
+END //
+DELIMITER ;
+
+6.
+DELIMITER //
+CREATE TRIGGER `trigger_6`
+BEFORE DELETE ON `product`
+FOR EACH ROW
+BEGIN
+    INSERT INTO product1 SET id=old.id AND COUNT(id);
+    IF CURRENT_USER() != 'dbo' THEN
+    	SIGNAL SQLSTATE '45000'
+    	SET MESSAGE_TEXT = 'Dbo user cannot delete.';
+   END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER `trigger_6`
+BEFORE DELETE ON `product`
+FOR EACH ROW
+BEGIN
+    INSERT INTO product1 SET id = old.id, Назва = old.Назва;
+    SELECT COUNT(id) AS заг_ксть_удал_книг FROM product1; 
+END //
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE GetProduct6()
+BEGIN
+	SELECT COUNT(id) AS заг_ксть_удал_книг FROM product1;    
+END$$
+DELIMITER ;
+
+7.
+DELIMITER //
+CREATE TRIGGER `trigger_7`
+BEFORE UPDATE ON `product`
+FOR EACH ROW
+BEGIN
+    IF CURRENT_USER() = 'dbo' AND OLD.Ціна = NEW.Ціна THEN
+    	SIGNAL SQLSTATE '45000'
+    	SET MESSAGE_TEXT = 'Dbo user cannot change price.';
+   END IF;
+END //
+DELIMITER ;
+
+8.DELIMITER //
+CREATE TRIGGER `trigger_8`
+AFTER DELETE ON product
+FOR EACH ROW
+BEGIN
+    DELETE FROM видавництво
+    WHERE видавництво.id = OLD.id;
+END //
+DELIMITER ;
+DELETE FROM `видавництво` WHERE Видавництво LIKE '%ДМК%';
+DELETE FROM `видавництво` WHERE Видавництво LIKE '%Еком%';
+
+DELIMITER //
+CREATE TRIGGER `trigger_8`
+BEFORE UPDATE ON `видавництво`
+FOR EACH ROW
+BEGIN
+    IF Видавництво RLIKE '%ДМК%'
+    	THEN SET Видавництво = NULL
+    ELSEIF Видавництво RLIKE '%Еком%'
+    	THEN SET Видавництво = NULL
+    END IF;
+END //
+DELIMITER ;
+
+9.DELIMITER $$
+CREATE PROCEDURE GetProduct1()
+BEGIN
+	IF id_edition >= 10 AND MONTH(Дата) AND YEAR(CURENT_DATE) THEN
+    	SIGNAL SQLSTATE '45000'
+    	SET MESSAGE_TEXT = 'A large number of new products in the current year of the given month.';
+   END IF;    
+END$$
+DELIMITER ;
+
+
+DELIMITER //
+CREATE TRIGGER `trigger_9`
+BEFORE UPDATE ON `видавництво`
+FOR EACH ROW
+BEGIN
+    CALL GetProduct1();
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER `trigger_9`
+BEFORE INSERT ON `видавництво`
+FOR EACH ROW
+BEGIN
+    CALL GetProduct1();
+END //
+DELIMITER ;
+INSERT INTO product (N, Код, Назва, Ціна, Сторінки, Дата, id_new, id_edition, id_format, id_circulation, id_topic, id_category) 
+VALUES 
+('19', '5119', 'Аппаратные средства мультимедия. Видеосистема РС', '15.51', '400', '2000-07-24', 1, 1, 1, 1, 1, 1),
+('200', '4920', 'Освой самостоятельно модернизацию и ремонт ПК за 24 часа, 2-е изд.', '18.90', '288', '2000-07-07', 1, 2, 1, 1, 1, 1);
+
+10.//Видавництво BHV не випускає книги формату 60х88 / 16.
+DELIMITER //
+CREATE  TRIGGER `trigger_10` BEFORE UPDATE ON `формат`
+FOR EACH ROW
+BEGIN
+   IF (Видавництво RLIKE "%BHV%") AND (OLD.Формат = '60х88 / 16') THEN
+       SIGNAL SQLSTATE '45000'
+       SET MESSAGE_TEXT = 'The edition can be more than 5000 circulation.';
+   END IF;
+END //
+DELIMITER ;
