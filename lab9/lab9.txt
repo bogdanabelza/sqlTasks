@@ -1,0 +1,83 @@
+1.//Розробити та перевірити скалярну (scalar) функцію, що повертає загальну вартість книг виданих в певному році.
+CREATE FUNCTION sum_price (yearr INT)
+RETURNS DOUBLE
+RETURN (SELECT SUM(`product`.`Ціна`) FROM
+`product` WHERE YEAR(`product`.`Дата`) = yearr) ;
+
+SELECT books1(2000);
+
+2.//Розробити і перевірити табличну (inline) функцію, яка повертає список книг виданих в певному році.
+CREATE FUNCTION books1 (yearr INT)
+RETURNS CHAR(250)
+RETURN (SELECT `product`.`Назва` FROM
+`product` WHERE YEAR(`product`.`Дата`) = yearr) ;
+
+SELECT books1(2000);//возращает ошибку больше одной записи
+
+DROP FUNCTION IF EXISTS books1;
+
+/*DELIMITER $$
+DELIMITER $$
+CREATE PROCEDURE GetBookYear(IN yearr INT)
+BEGIN
+	SELECT Назва, Дата
+	FROM `product`
+    WHERE YEAR(Дата) = yearr;
+END$$
+DELIMITER ;
+
+CALL GetBookYear(2000);*/
+3.
+$ mysqli = new mysqli ( 'BHV С.-Петербург'; 'Вильямс'; 'Питер'; 'МикроАрт'; 'Триумф'; 'Эком'; 'Русская редакция'; 'DiaSoft'; 'ДМК' );
+
+
+4.
+DELIMITER $$
+CREATE PROCEDURE my_proc_cursors()
+BEGIN
+    /*Обьявление курсора*/
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE name varchar(100);
+    DECLARE cur_1 CURSOR FOR SELECT Назва FROM `product`;
+    /*описываем как действовать во время исключения*/
+    DECLARE CONTINUE HANDLER FOR NOT FOUND 
+    /*а именно : установим флаг*/
+    SET done = TRUE;
+    /*Открытия курсора*/
+    OPEN cur_1; 
+    /*цикл чтения курсора*/
+    read_loop: LOOP
+        FETCH cur_1 INTO name;
+        /*проверка флага*/
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+        /*обработка данных*/
+        SET name = name;
+    END LOOP;
+ 
+    /*завершаем работу с курсором*/
+    CLOSE cur_1;
+END; $$
+
+5.DELIMITER $$
+CREATE PROCEDURE GetProductYear(IN yearr INT)
+BEGIN
+    DECLARE finished INTEGER DEFAULT 0;
+    DECLARE yearr INT;
+    DECLARE curYear CURSOR FOR SELECT YEAR(Дата) FROM `product`;
+    DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET finished = 1;
+	OPEN curYear;
+	getYear: LOOP
+		FETCH curYear INTO yearr;
+		IF finished = 1 THEN 
+			LEAVE getYear;
+		END IF;
+		SELECT YEAR(Дата) FROM product WHERE YEAR(Дата) = yearr;
+	END LOOP getYear;
+	CLOSE curYear;
+END$$
+DELIMITER ;
+
+CALL GetBookYear(2000);
