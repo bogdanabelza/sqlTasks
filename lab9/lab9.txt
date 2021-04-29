@@ -27,8 +27,19 @@ END$$
 DELIMITER ;
 
 CALL GetBookYear(2000);*/
-3.
-$ mysqli = new mysqli ( 'BHV С.-Петербург'; 'Вильямс'; 'Питер'; 'МикроАрт'; 'Триумф'; 'Эком'; 'Русская редакция'; 'DiaSoft'; 'ДМК' );
+
+3. DELIMITER $$
+CREATE PROCEDURE GetProduct2(IN v_Видавництво VARCHAR(20))
+BEGIN
+	SELECT Назва, Видавництво, Дата
+	FROM `product`
+    INNER JOIN видавництво ON product.id = видавництво.id_edition
+    WHERE Видавництво = v_Видавництво;
+END$$
+DELIMITER ;
+CALL GetProduct2('Вильямс');
+
+//$ mysqli = new mysqli ( 'BHV С.-Петербург'; 'Вильямс'; 'Питер'; 'МикроАрт'; 'Триумф'; 'Эком'; 'Русская редакция'; 'DiaSoft'; 'ДМК' );
 
 
 4.
