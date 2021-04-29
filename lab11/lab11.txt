@@ -1,0 +1,254 @@
+CREATE DATABASE student;
+
+CREATE TABLE students(
+    id INT NOT NULL AUTO_INCREMENT,
+    Фамилия VARCHAR(20) NOT NULL,
+    Имя VARCHAR(20) NOT NULL,
+    Отчество VARCHAR(20) NOT NULL,
+    Дата_рождения DATE NOT NULL,
+    id_specialty INT,
+    id_residence INT,
+    id_army INT,
+    id_scholarship INT,
+    PRIMARY KEY(id)
+);
+
+
+CREATE TABLE specialty(
+    id INT NOT NULL AUTO_INCREMENT,
+    Название VARCHAR(100) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+ALTER TABLE `students`
+ADD FOREIGN KEY (id_specialty)
+REFERENCES specialty(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+INSERT INTO specialty (Название)
+VALUES
+('Вычислительная математика'),
+('Дискретная математика'),
+('Иностранный язык'),
+('Интернет технологии'),
+('Прикладная информатика'),
+('Программирование БД'),
+('Радиотехника'),
+('Спецтехнология кабелей'),
+('Электроизмерение');
+
+CREATE TABLE residence(
+    id INT NOT NULL AUTO_INCREMENT,
+    Название VARCHAR(10) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+ALTER TABLE `students`
+ADD FOREIGN KEY (id_residence)
+REFERENCES residence(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+INSERT INTO residence (Название)
+VALUES
+('Дом'),
+('Общежитие'),
+('Квартира');
+
+CREATE TABLE army(
+    id INT NOT NULL AUTO_INCREMENT,
+    Название VARCHAR(3) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+ALTER TABLE `students`
+ADD FOREIGN KEY (id_army)
+REFERENCES army(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+INSERT INTO army (Название)
+VALUES
+('Да'),
+('Нет');
+
+CREATE TABLE scholarship(
+    id INT NOT NULL AUTO_INCREMENT,
+    Название VARCHAR(3) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+ALTER TABLE `students`
+ADD FOREIGN KEY (id_scholarship)
+REFERENCES scholarship(id) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+INSERT INTO scholarship (Название)
+VALUES
+('Да'),
+('Нет');
+
+
+INSERT INTO students (Фамилия, Имя, Отчество, Дата_рождения, id_specialty, id_residence, id_army, id_scholarship) 
+VALUES 
+('Гарипов', 'Ильнур', 'Данилович', '2000-07-04', 1,	1, 1, 1),
+('Петров', 'Павел', 'Егорович', '2000-07-05', 2, 2, 2, 1),
+('Максимов', 'Константин', 'Львович', '2002-07-06', 3, 3, 1, 2),
+('Ибрагимов', 'Рустам', 'Римович', '2001-07-07', 4, 2, 2, 2),
+('Гареев', 'Юнир', 'Биктимирович', '2000-07-08', 4, 1, 1, 1),
+('Ожегов', 'Александр', 'Степанович', '2002-07-09', 5, 3, 2, 2),
+('Низамов', 'Роберт', 'Аданикович', '1999-04-02', 5, 2, 1, 1),
+('Алексеев', 'Дмитрий', 'Михайлович', '1999-04-03', 6, 1, 2, 2),
+('Иван', 'Иванов', 'Иванович', '1999-04-04', 7, 2, 2, 1),
+('Иван', 'Петров', 'Петрович', '1997-05-02', 8, 3, 1, 1),
+('Иван', 'Сидоров', 'Михайлович', '2000-05-03', 9, 2, 2, 1),
+('Иван', 'Башков', 'Иванович', '1997-05-04', 9, 1, 1, 2),
+('Ирина', 'Миронова', 'Николаевна', '1998-05-04', 5, 3, 2, 2),
+('Арбузов', 'Николай', 'Николаевич', '1999-05-04', 8, 1, 2, 2),
+('Степанская', 'Ольга', 'Витальевна', '1997-05-05', 3, 3, 2, 1);
+
+//Вывести значение всех столбцов(внутрішнє з'єднання, застосовуючи where)
+SELECT * FROM `students` 
+INNER JOIN specialty ON students.id_specialty = specialty.id
+INNER JOIN residence ON students.id_residence = residence.id
+INNER JOIN army ON students.id_army = army.id
+INNER JOIN scholarship ON students.id_scholarship = scholarship.id;
+
+SELECT * FROM `students`, `specialty`, `residence`, `army`, `scholarship` 
+WHERE students.id_specialty = specialty.id AND
+students.id_residence = residence.id AND
+students.id_army = army.id AND
+students.id_scholarship = scholarship.id;
+
+//Агрегация и групированние по дате
+SELECT Дата_рождения, COUNT(*) AS дата FROM `students`
+WHERE YEAR(Дата_рождения) BETWEEN 2000 AND 2002 GROUP BY Дата_рождения;
+
+//Подзапросы, вывести всех студентов у которых есть стипендия
+SELECT students.*
+FROM `students`
+INNER JOIN scholarship ON students.id_scholarship = scholarship.id
+WHERE Название IN (SELECT Название FROM `scholarship`
+	WHERE Название = 'Да');
+
+//Вывести пары студентов у которых одинаковая специализация(самооб’єднання і аліаси)
+SELECT CONCAT(A.Фамилия, ',', B.Фамилия) AS Назва1, A.id_specialty
+FROM `students` A, `students` B
+WHERE A.id <> B.id
+AND A.id_specialty = B.id_specialty
+ORDER BY A.id_specialty
+
+//Вывести всех студентов у которых хотя бы одна специализация начинается с буквы 'И'(EXISTS)
+SELECT * FROM `students`
+WHERE EXISTS 
+(SELECT * FROM specialty WHERE students.id_specialty = specialty.id AND Название LIKE 'И%');
+//нет буквы 'И'
+SELECT * FROM `students`
+WHERE NOT EXISTS 
+(SELECT * FROM specialty WHERE students.id_specialty = specialty.id AND Название LIKE 'И%');
+
+//Вивести відсортований в зворотному порядку загальний список перших слів, назв спеціальності і проживання, що не повторюються. Використовувати union.
+SELECT DISTINCT IF(INSTR(Название, ' ') >0, LEFT(Название, INSTR(Название, ' ') - 1), Название) AS new
+FROM residence
+UNION SELECT DISTINCT IF(INSTR(Название, ' ') >0, LEFT(Название, INSTR(Название, ' ') - 1), Название) AS new
+FROM specialty
+ORDER BY new DESC
+
+// процедуры без параметра
+DELIMITER $$
+CREATE PROCEDURE GetResidence()
+BEGIN
+	SELECT Имя, Фамилия, Отчество, Название
+	FROM `students`
+    INNER JOIN residence ON students.id_residence = residence.id
+    WHERE Название LIKE '%Общежитие%';  
+END$$
+DELIMITER ;
+CALL GetResidence();
+
+//с параметром
+DELIMITER $$
+CREATE PROCEDURE GetResidence1(IN v_Residence VARCHAR(10))
+BEGIN
+	SELECT Имя, Фамилия, Отчество, Название
+	FROM `students`
+    INNER JOIN residence ON students.id_residence = residence.id
+    WHERE Название = v_Residence; 
+END$$
+DELIMITER ;
+CALL GetResidence1('Общежитие');
+
+
+//Тригер додавання імен: робить конкатенацію Прізвища та Ім’я у окремий стовпець
+ALTER TABLE students ADD COLUMN full_name Varchar(100);
+
+CREATE TRIGGER user_update BEFORE UPDATE
+ON students
+FOR EACH ROW SET
+NEW.full_name = CONCAT(NEW.Имя, ' ', NEW.Фамилия);
+
+UPDATE `students` SET `id_scholarship` = '2' WHERE `students`.`id` = 15
+
+//Додає запис тільки якщо менше 20 рядків. Якщо в таблиці більше 20 рядків – видає помилку.
+DELIMITER $$
+CREATE TRIGGER trig BEFORE INSERT ON `students`
+FOR EACH ROW
+    IF (SELECT COUNT(*) FROM `students`) > 20 THEN
+         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Кількість більша 20';
+    ELSEIF (select count(*) from `students`) < 5 THEN
+         SET @err2='Кількість менша 5 ';
+END IF;
+$$
+DELIMITER ;
+
+INSERT INTO students (Фамилия, Имя, Отчество, Дата_рождения, id_specialty, id_residence, id_army, id_scholarship) 
+VALUES 
+('Гарипов', 'Ильнур', 'Данилович', '2000-07-04', 1,	1, 1, 1),
+('Петров', 'Павел', 'Егорович', '2000-07-05', 2, 2, 2, 1),
+('Максимов', 'Константин', 'Львович', '2002-07-06', 3, 3, 1, 2),
+('Ибрагимов', 'Рустам', 'Римович', '2001-07-07', 4, 2, 2, 2),
+('Гареев', 'Юнир', 'Биктимирович', '2000-07-08', 4, 1, 1, 1),
+('Ожегов', 'Александр', 'Степанович', '2002-07-09', 5, 3, 2, 2);
+
+//Розробити та перевірити скалярну (scalar) функцію, що повертає загальну вартість студентів, що проживають в певній місцевості
+
+CREATE FUNCTION resid (res VARCHAR(10))
+RETURNS DOUBLE
+RETURN (SELECT COUNT(`students`.`Имя`) FROM
+`students` INNER JOIN residence ON students.id_residence = residence.id WHERE `residence`.`Название` = res) ;
+
+SELECT resid('Дом')
+
+//що мають стипендію
+CREATE FUNCTION students_sch (sch INT)
+RETURNS INT
+RETURN (SELECT COUNT(`students`.`Имя`) FROM
+`students` WHERE `students`.`id_scholarship` = sch) ;
+
+SELECT students_sch(1)
+
+//Создание курсора для вывода фамилий всех студентов
+DELIMITER $$
+CREATE PROCEDURE createName (
+	INOUT first_name varchar(4000)
+)
+BEGIN
+	DECLARE finished INTEGER DEFAULT 0;
+	DECLARE last_name varchar(100) DEFAULT "";
+	DEClARE curName 
+		CURSOR FOR 
+			SELECT Фамилия FROM students;
+	DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET finished = 1;
+
+	OPEN curName;
+
+	getName: LOOP
+		FETCH curName INTO last_name;
+		IF finished = 1 THEN 
+			LEAVE getName;
+		END IF;
+		SET first_name = CONCAT(last_name,";",first_name);
+	END LOOP getName;
+	CLOSE curName;
+
+END$$
+DELIMITER ;
+//Вызов
+SET @firstName = "";
+CALL createName(@firstName);
+SELECT @firstName;
